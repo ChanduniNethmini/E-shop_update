@@ -12,6 +12,7 @@ const dbDebugger = require("debug")("app:db");
 const logger = require("./src/utils/logger");
 //Create the Express App
 const app = express();
+const csurf = require("csurf"); // Import the csurf middleware- IT20217990
 
 //Importing routes
 
@@ -61,6 +62,33 @@ if (app.get("env") === "development") {
 	app.use(morgan("tiny"));
 	startupDebugger("✨ Enabled Morgon......");
 }
+
+// Enable CSRF protection
+const csrfProtection = csurf({ cookie: true });
+app.use(csrfProtection);
+
+// route handler with CSRF token verification
+app.post("/submit", (req, res) => {
+	
+	// Verify CSRF token
+	if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
+	  return res.status(403).send("CSRF token validation failed.");
+	}
+  
+	// Process the form submission
+	const formData = req.body;
+
+	// save data to MongoDB
+	const newRecord = new MyModel(formData);
+	newRecord.save((err, savedRecord) => {
+	  if (err) {
+		console.error(err);
+		return res.status(500).send("Error saving data.");
+	  }
+	  // Data saved successfully
+	  res.status(200).send("Form submitted and data saved successfully.");
+	});
+});
 
 app.get("/", (request, response) => {
 	response.send("<h3>🖥️ Welcome API Documentation</h3>");

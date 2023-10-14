@@ -5,21 +5,39 @@ import insert from "../../images/insert.gif";
 import "./myStyles.css";
 
 export default class CreateOrders extends Component {
-	//intialization
+	
+	// constructor(props) {
+	// 	super(props);
+	// 	this.state = {
+	// 		name: "",
+	// 		postalNo: "",
+	// 		street: "",
+	// 		town: "",
+	// 		contactNo: "",
+	// 		orderDate: "",
+	// 		status: "Pending",
+	// 		// cartTotal: "",
+	// 	};
+	// }
 
+	//intialization
 	constructor(props) {
 		super(props);
 		this.state = {
+		  name: "",
+		  postalNo: "",
+		  street: "",
+		  town: "",
+		  contactNo: "",
+		  orderDate: "",
+		  status: "Pending",
+		  //cartTotal: "",
+		  errors: {
 			name: "",
-			postalNo: "",
-			street: "",
-			town: "",
 			contactNo: "",
-			orderDate: "",
-			status: "Pending",
-			// cartTotal: "",
+		  },
 		};
-	}
+	  }
 
 	componentDidMount() {
 		const cart = localStorage.getItem("react-use-cart");
@@ -31,14 +49,44 @@ export default class CreateOrders extends Component {
 		});
 	}
 
+	// handleInputChange = (e) => {
+	// 	const { name, value } = e.target;
+
+	// 	this.setState({
+	// 		...this.state,
+	// 		[name]: value,
+	// 	});
+	// };
+
 	handleInputChange = (e) => {
 		const { name, value } = e.target;
-
+	  
+		// Initialize error messages
+		let errors = { ...this.state.errors };
+	  
+		// Perform client-side validation for each input field
+		if (name === "name") {
+		  if (value.length < 2) {
+			errors.name = "Name should be at least 2 characters long";
+		  } else {
+			errors.name = ""; 
+		  }
+		} else if (name === "contactNo") {
+		  if (!/^[0-9]{10}$/.test(value)) {
+			errors.contactNo = "Contact number should be a 10-digit number";
+		  } else {
+			errors.contactNo = ""; 
+		  }
+		}
+	  
+		// Update the state with the validated value and errors
 		this.setState({
-			...this.state,
-			[name]: value,
+		  [name]: value,
+		  errors: errors,
 		});
-	};
+	  };
+
+
 	//save to db
 	onSubmit = (e) => {
 		e.preventDefault();
@@ -174,6 +222,7 @@ export default class CreateOrders extends Component {
 													onChange={this.handleInputChange}
 													required
 												/>
+												<div className="text-danger">{this.state.errors.name}</div> {/* Display the error message */}
 											</div>
 
 											<label style={{ marginBottom: "5px" }} className="topic">
@@ -227,6 +276,7 @@ export default class CreateOrders extends Component {
 													value={this.state.contactNo}
 													onChange={this.handleInputChange}
 												/>
+												<div className="text-danger">{this.state.errors.contactNo}</div> {/* Display the error message */}
 											</div>
 
 											<div className="form-group" style={{ marginBottom: "15px" }}>
