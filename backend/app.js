@@ -49,19 +49,6 @@ app.use("/api/deleveryService", require("./src/routes/delivery.service.routes"))
 app.use("/api/message", require("./src/routes/messages.routes"));
 app.use("/api/dashboard", require("./src/routes/dashboard.routes"));
 app.use("/api/report", require("./src/routes/pdf.report.generate.manager.routes"));
-//"mongodb://localhost:27017/SPM"
-mongoose.connect(configurationManager.connectionString, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-});
-
-mongoose.connection.once("open", () => {
-	logger.info(" Connect Database....");
-});
-if (app.get("env") === "development") {
-	app.use(morgan("tiny"));
-	startupDebugger("✨ Enabled Morgon......");
-}
 
 // Enable CSRF protection
 const csrfProtection = csurf({ cookie: true });
@@ -69,24 +56,23 @@ app.use(csrfProtection);
 
 // route handler with CSRF token verification
 app.post("/submit", (req, res) => {
-	
 	// Verify CSRF token
 	if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
-	  return res.status(403).send("CSRF token validation failed.");
+		return res.status(403).send("CSRF token validation failed.");
 	}
-  
+
 	// Process the form submission
 	const formData = req.body;
 
 	// save data to MongoDB
 	const newRecord = new MyModel(formData);
 	newRecord.save((err, savedRecord) => {
-	  if (err) {
-		console.error(err);
-		return res.status(500).send("Error saving data.");
-	  }
-	  // Data saved successfully
-	  res.status(200).send("Form submitted and data saved successfully.");
+		if (err) {
+			console.error(err);
+			return res.status(500).send("Error saving data.");
+		}
+		// Data saved successfully
+		res.status(200).send("Form submitted and data saved successfully.");
 	});
 });
 
@@ -95,6 +81,18 @@ app.get("/", (request, response) => {
 });
 
 const port = process.env.PORT || 4000;
+const DB_URL = process.env.DB_URL;
+
+//establishing Database connection
+mongoose
+	.connect(DB_URL, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => {
+		console.log("DB is connected");
+	})
+	.catch((err) => console.log("DB connection err", err));
 
 app.listen(port, () => {
 	logger.info(`Web API Development: ${port}`);
