@@ -6,7 +6,7 @@ import "./productstyle.css";
 const HomeCart = () => {
 	return (
 		<div>
-			<section className="py-6 container">
+			<section className="container">
 				<div className="row justify-content-center" style={{ height: "600px", overflowY: "scroll" }}>
 					{data.productData.map((item, index) => {
 						return (

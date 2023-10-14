@@ -5,8 +5,8 @@ const Itemcard = (props) => {
 	const { addItem } = useCart();
 
 	return (
-		<div className="col-12 col-md-4 mb-4">
-			<div className="card p-0 overflow-hidden h-100 shadow" style={{ borderRadius: "20px", borderColor: "blue" }}>
+		<div className="col-4">
+			<div className="card6 p-0 overflow-hidden h-100 shadow" style={{ borderRadius: "20px", borderColor: "blue" }}>
 				<img
 					src={props.img}
 					className="card-img-top img-fluid"
